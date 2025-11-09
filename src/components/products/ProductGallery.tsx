@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Product } from "@/types/product";
 
 interface Props {
@@ -12,13 +12,7 @@ export default function ProductGallery({ product }: Props) {
   const [selectedImage, setSelectedImage] = useState(
     product.thumbnail || images[0]
   );
-  const [activeThumb, setActiveThumb] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (images.length > 0) {
-      setActiveThumb(images[0]);
-    }
-  }, [images]);
+  const [activeThumb, setActiveThumb] = useState<string>(images[0] || "");
 
   const handleThumbnailClick = (img: string) => {
     setSelectedImage(img);

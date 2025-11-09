@@ -26,7 +26,7 @@ export const productService = {
 
     if (!userId) throw new Error("Kullanıcı ID bulunamadı.");
 
-    const response = await api.post("https://dummyjson.com/carts/add", {
+    const response = await api.post("/carts/add", {
       userId,
       products: [{ id: productId, quantity }],
     });
@@ -34,7 +34,7 @@ export const productService = {
     return response.data;
   },
   async getUserCart(userId: number) {
-    const res = await api.get(`https://dummyjson.com/carts/user/${userId}`);
+    const res = await api.get(`/carts/user/${userId}`);
     return res.data.carts?.[0] || { products: [], total: 0 };
   },
 };

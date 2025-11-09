@@ -12,9 +12,10 @@ import StarHalf from "@/assets/icons/StarHalf";
 
 interface Props {
   product: Product;
+  index?: number;
 }
 
-export default function ProductCard({ product }: Props) {
+export default function ProductCard({ product, index = 0 }: Props) {
   const [loading, setLoading] = useState(false);
   const { addToCart } = useCart();
 
@@ -54,7 +55,8 @@ export default function ProductCard({ product }: Props) {
           width={180}
           height={175}
           className="object-contain p-1"
-          priority
+          priority={index < 3}
+          loading={index < 3 ? undefined : "lazy"}
         />
       </div>
 

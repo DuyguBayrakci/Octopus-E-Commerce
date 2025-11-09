@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
-import { productService } from "@/services/productService";
+import { useState } from "react";
+import { useCategories } from "@/context/CategoryContext";
 import SearchIcon from "@/assets/icons/SearchIcon";
 import Button from "@/components/common/Button";
 
@@ -15,14 +15,8 @@ export default function FilterSidebar({
   search,
   onSearchChange,
 }: Props) {
-  const [categories, setCategories] = useState<
-    (string | { slug: string; name: string; url?: string })[]
-  >([]);
+  const { categories } = useCategories();
   const [selected, setSelected] = useState<string[]>([]);
-
-  useEffect(() => {
-    productService.getCategories().then(setCategories);
-  }, []);
 
   const toggleCategory = (category: string) => {
     const updated = selected.includes(category)
@@ -51,25 +45,20 @@ export default function FilterSidebar({
       </h3>
 
       <div className="space-y-4 mb-4 max-h-[400px] overflow-y-auto custom-scrollbar">
-        {categories.map((cat, i) => {
-          const slug = typeof cat === "string" ? cat : cat.slug;
-          const name = typeof cat === "string" ? cat : cat.name;
-
-          return (
-            <label
-              key={slug || i}
-              className="flex items-center gap-2 text-dark font-normal text-sm font-poppins capitalize cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                checked={selected.includes(slug)}
-                onChange={() => toggleCategory(slug)}
-                className="accent-primary-hover w-4 h-4"
-              />
-              {name}
-            </label>
-          );
-        })}
+        {categories.map((cat, i) => (
+          <label
+            key={cat || i}
+            className="flex items-center gap-2 text-dark font-normal text-sm font-poppins capitalize cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              checked={selected.includes(cat)}
+              onChange={() => toggleCategory(cat)}
+              className="accent-primary-hover w-4 h-4"
+            />
+            {cat}
+          </label>
+        ))}
       </div>
 
       <Button
