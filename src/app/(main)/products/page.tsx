@@ -1,15 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import ProductCard from "@/components/products/ProductCard";
 import FilterSidebar from "@/components/products/FilterSidebar";
 import { Product } from "@/types/product";
 import { productService } from "@/services/productService";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Loader from "@/components/common/Loader";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [filtered, setFiltered] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -21,38 +19,42 @@ export default function ProductsPage() {
       setLoading(true);
       const res = await productService.getProducts();
       setProducts(res);
-      setFiltered(res);
       setLoading(false);
     };
     fetchProducts();
   }, []);
 
-  useEffect(() => {
+  const filtered = useMemo(() => {
     let result = products;
 
-    if (categories.length)
+    if (categories.length > 0) {
       result = result.filter((p) => categories.includes(p.category));
+    }
 
-    if (search)
+    if (search) {
       result = result.filter((p) =>
         p.title.toLowerCase().includes(search.toLowerCase())
       );
+    }
 
-    setFiltered(result);
+    return result;
+  }, [products, categories, search]);
+
+  useEffect(() => {
     setPage(1);
-  }, [categories, search, products]);
+  }, [filtered]);
 
-  const paginated = filtered.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage),
+    [filtered, page]
   );
+
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   if (loading) return <Loader />;
 
   return (
-    <ProtectedRoute>
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 min-h-screen px-4 lg:px-8 pb-20">
+    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 min-h-screen px-4 lg:px-8 pb-20">
         <aside className="w-full lg:w-[260px] flex-shrink-0">
           <FilterSidebar
             onFilterChange={setCategories}
@@ -79,8 +81,8 @@ export default function ProductsPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-5 lg:gap-6">
-                {paginated.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                {paginated.map((product, idx) => (
+                  <ProductCard key={product.id} product={product} index={idx} />
                 ))}
               </div>
               <div className="flex justify-center mt-8 gap-2 flex-wrap">
@@ -118,6 +120,5 @@ export default function ProductsPage() {
           )}
         </section>
       </div>
-    </ProtectedRoute>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import { CategoryProvider } from "@/context/CategoryContext";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -28,9 +29,11 @@ export default function RootLayout({
     >
       <body>
         <AuthProvider>
-          <main>
-            <CartProvider>{children}</CartProvider>
-          </main>
+          <CategoryProvider>
+            <main>
+              <CartProvider>{children}</CartProvider>
+            </main>
+          </CategoryProvider>
         </AuthProvider>
       </body>
     </html>
